@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <title>Tic-Tac-Toe Version #4</title>
+    <style type="text/css">
+      body,
+      html {
+        margin: 0px;
+        padding: 0px;
+        width: 100%;
+        text-align: center;
+      }
+
+      .square {
+        height: 100px;
+        width: 100px;
+        margin: 5px;
+        border: 1px, solid black;
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        font-size: 32px;
+      }
+
+      #full_board {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: auto;
+        margin-right: auto;
+        width: 337px;
+      }
+
+      .square:hover {
+        background-color: rgb(234, 255, 0);
+      }
+
+      h1 {
+        text-align: center;
+        color: rgba(39, 212, 4, 0.772);
+        margin-top: 50px;
+        border: 4px, solid rgba(39, 212, 4, 0.772);
+        display: inline-block;
+        font-weight: bold;
+        padding-left: 30px;
+        padding-right: 30px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+
+      h1:hover {
+        background-color: rgb(85, 255, 0);
+        color: rgb(234, 255, 41);
+        border: 4px, dashed rgba(39, 212, 4, 0.772);
+        padding: 10px;
+      }
+
+      #turn_tracker {
+        border: 1px, solid black;
+        background-color: rgb(209, 209, 209);
+        font-size: 25px;
+        margin-bottom: 30px;
+        display: inline-block;
+        padding-left: 100px;
+        padding-right: 100px;
+      }
+
+      #win_condition {
+        border: 1px, solid black;
+        background-color: rgb(118, 223, 130);
+        font-size: 23px;
+        margin-top: 30px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        display: none;
+      }
+
+      #clear_game {
+        border: 1px, solid black;
+        background-color: rgb(198, 198, 198);
+        font-size: 15px;
+        margin-top: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        width: 125px;
+        height: 35px;
+        cursor: pointer;
+      }
+
+      #clear_game:hover {
+        background-color: rgb(239, 234, 139);
+      }
+
+      .bottom_layer {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>X-CITING AND O-VERWHELMINGLY FUN!</h1>
+    <br />
+    <div id="turn_tracker"></div>
+    <div id="full_board">
+      <script>
+        const NUM_SQUARES = 9;
+        for (i = 0; i < NUM_SQUARES; i++) {
+          id = "sq" + i;
+          document.write("<div class='square' id='" + id + "'></div>");
+        }
+
+        let all_squares = [];
+        for (i = 0; i < NUM_SQUARES; i++) {
+          all_squares.push(document.getElementById("sq" + i));
+        }
+
+        for (i = 0; i < all_squares.length; i++) {
+          all_squares[i].addEventListener("click", square_was_clicked);
+        }
+
+        function square_was_clicked(clicked_event) {
+          if (
+            found_winner == "X" ||
+            found_winner == "O" ||
+            found_winner == "S"
+          ) {
+            return;
+          }
+
+          let change_player = false;
+
+          if (
+            document.getElementById(clicked_event.target.id).innerText != "X" &&
+            document.getElementById(clicked_event.target.id).innerText != "O"
+          ) {
+            document.getElementById(clicked_event.target.id).innerText = x_or_o;
+            change_player = true;
+          }
+
+          console.log(change_player)
+
+
+          if (x_or_o == "X" && change_player) {
+            x_or_o = "O";
+          } else if (x_or_o == "O" && change_player) {
+            x_or_o = "X";
+          } else {
+            return;
+          }
+
+          document.getElementById("turn_tracker").innerText =
+            x_or_o + "'s Turn";
+
+          all_squares.forEach(place_moves);
+          check_winconditions();
+          clear_moves();
+          clear_winconditions();
+        }
+
+        let chosen_player;
+        let x_or_o;
+        let moves = [];
+        let winconditions = [];
+        let found_winner;
+
+        function start_game() {
+          chosen_player = Math.floor(Math.random() * 2 + 1);
+          x_or_o = "";
+          if (chosen_player == 1) {
+            x_or_o = "X";
+          } else {
+            x_or_o = "O";
+          }
+          document.getElementById("turn_tracker").innerText =
+            x_or_o + "'s Turn";
+        }
+
+        function clear_moves() {
+          moves = [];
+        }
+
+        function clear_winconditions() {
+          winconditions = [];
+        }
+
+        function place_moves(next_square) {
+          let found_text = next_square.innerText;
+          if (found_text == "") {
+            found_text = "-";
+          }
+          moves.push(found_text);
+        }
+
+        function check_winconditions() {
+          console.log(moves);
+          let first_row = "";
+          first_row += moves[0];
+          first_row += moves[1];
+          first_row += moves[2];
+
+          winconditions.push(first_row);
+
+          let second_row = "";
+          second_row += moves[3];
+          second_row += moves[4];
+          second_row += moves[5];
+
+          winconditions.push(second_row);
+
+          let third_row = "";
+          third_row += moves[6];
+          first_row += moves[7];
+          first_row += moves[8];
+
+          winconditions.push(third_row);
+
+          let first_column = "";
+          first_column += moves[0];
+          first_column += moves[3];
+          first_column += moves[6];
+
+          winconditions.push(first_column);
+
+          let second_column = "";
+          second_column += moves[1];
+          second_column += moves[4];
+          second_column += moves[7];
+
+          winconditions.push(second_column);
+
+          let third_column = "";
+          third_column += moves[2];
+          third_column += moves[5];
+          third_column += moves[8];
+
+          winconditions.push(third_column);
+
+          let first_diagonal = "";
+          first_diagonal += moves[0];
+          first_diagonal += moves[4];
+          first_diagonal += moves[8];
+
+          winconditions.push(first_diagonal);
+
+          let second_diagonal = "";
+          second_diagonal += moves[2];
+          second_diagonal += moves[4];
+          second_diagonal += moves[6];
+
+          winconditions.push(second_diagonal);
+
+      
+            found_winner = check_for_winner();
+
+            if (found_winner == "X") {
+              $("#win_condition").text("Player X Won!").show();
+            } else if (found_winner == "O") {
+              $("#win_condition").text("Player O Won!").show();
+            } else if (found_winner == "S") {
+              $("#win_condition").text("No Winner! Stalemate!").show();
+            }
+
+        }
+
+        function check_for_winner() {
+          for (i = 0; i < winconditions.length; i++) {
+            if (winconditions[i] == "XXX") {
+              return "X";
+            }
+
+            if (winconditions[i] == "OOO") {
+              console.log("Hello");
+              return "O";
+            }
+          }
+
+          let hyphen_found = check_for_hyphens();
+
+          if (!hyphen_found) {
+            return "S";
+          }
+
+          return "";
+        }
+
+        function check_for_hyphens() {
+          for (i = 0; i < moves.length; i++) {
+            if (moves[i] == "-") {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        start_game();
+      </script>
+
+      <div class="bottom_layer">
+        <div id="win_condition"></div>
+        <button id="clear_game">New Game</button>
+      </div>
+
+      <script>
+        function clear_squares() {
+          for (let i = 0; i < all_squares.length; i++) {
+            all_squares[i].innerText = "";
+          }
+          found_winner = "";
+          $("#win_condition").hide();
+          start_game();
+        }
+
+        let clear_button = document.getElementById("clear_game");
+        clear_button.addEventListener("click", function () {
+          clear_squares();
+        });
+      </script>
+    </div>
+  </body>
+</html>
